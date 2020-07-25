@@ -1,0 +1,61 @@
+Shiny Application and Reproducible Pitch
+========================================================
+author: Yanfei Chen
+date: `r date()`
+autosize: true
+
+Executive Summary
+========================================================
+
+I created a Shiny App to predict the trunk circumference of an orange tree. The dataset, **Orange**, comes from the built-in {datasets} package.
+
+The 3 variables are:
+
+- **Tree**: an ordered factor indicating the tree on which the measurement is made. The ordering is according to increasing maximum diameter.
+- **age**: a numeric vector giving the age of the tree (days since 1968/12/31)
+- **circumference**: a numeric vector of trunk circumferences (mm). This is probably “circumference at breast height”, a standard measurement in forestry.
+
+Exploratory Analysis
+========================================================
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(gridExtra)
+g1 <- ggplot(Orange, aes(age, circumference))
+g1 <- g1 + geom_point() + facet_grid(. ~ Tree) + 
+      geom_smooth(method = "lm", se = F) + theme_bw()
+g2 <- ggplot(Orange, aes(age, circumference))
+g2 <- g2 + geom_point() + 
+      geom_smooth(method = "lm", se = F) + theme_bw()
+grid.arrange(g1, g2, ncol=2)
+```
+
+Findings
+========================================================
+
+- The linear correlation between circumference and age for **each** type of tree is very strong.
+- The linear correlation between circumference and age for **all** trees is not as strong as for **each** type of tree.
+
+So, I chose 2 models to predict the circumference.
+
+Models
+========================================================
+
+### Model 1
+
+Predictor: age
+
+```{r, eval=FALSE}
+mod1 <- lm(circumference ~ age, data = subOrange)
+```
+
+where `subOrange` is the subsetted **Orange** dataset in which the Trees of all the observations are identical.
+
+### Model 2
+
+Predictor: Tree, age
+
+```{r, eval=FALSE}
+mod2 <- lm(circumference ~ ., data = Orange)
+```
+
